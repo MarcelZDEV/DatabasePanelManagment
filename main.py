@@ -20,6 +20,12 @@ def home_page():
 
 @app.route("/account-chose")
 def account():
+    if "admin" in session:
+        root = session["admin"]
+        return render_template("account.jinja2", user=root)
+    elif "normal" in session:
+        user = session["normal"]
+        return render_template("account.jinja2", user=user)
     return render_template("account.jinja2")
 
 
@@ -75,6 +81,11 @@ def logout():
     session.pop("normal", None)
     session.pop("admin", None)
     return render_template('account.jinja2')
+
+
+@app.route('/Databases')
+def databases():
+    return render_template('database_home.jinja2')
 
 
 if __name__ == '__main__':

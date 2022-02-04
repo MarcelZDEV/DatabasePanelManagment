@@ -6,4 +6,7 @@
         <a class="btn btn-lg btn-success" style="margin: 10px" href="{{ url_for ('register') }}">Register</a>
         <a class="btn btn-lg btn-danger" style="margin: 10px" href="{{ url_for ('logout') }}">Logout</a>
     </div>
+    <div class="border-top">
+        <header class="display-4 text-light d-flex justify-content-center">{{ user }}</header>
+    </div>
 {% endblock %}
