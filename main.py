@@ -6,7 +6,7 @@ from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = "root"
-app.permanent_session_lifetime = timedelta(minutes=10)
+app.permanent_session_lifetime = timedelta(minutes=60)
 
 
 @app.route('/')
@@ -50,6 +50,8 @@ def login():
             if 'root' in results:
                 session["admin"] = user
                 print("admin")
+            else:
+                session["normal"] = user
             return redirect(url_for('home_page'))
         else:
             return render_template('login.jinja2')
@@ -75,6 +77,7 @@ def register():
             value = (user_reg, password_reg, email, "normal")
             cursor.execute(execute, value)
             db.commit()
+            return render_template('login.jinja2')
     return render_template('register.jinja2')
 
 
@@ -96,8 +99,8 @@ def databases():
 
 @app.route('/Connect', methods=['POST', 'GET'])
 def connect():
-    if request.method == 'POST':
-        if 'admin' in session:
+    if "admin" in session:
+        if request.method == 'POST':
             host_connect = request.form['host_connect']
             user_connect = request.form['name_connect']
             pass_connect = request.form['pass_connect']
@@ -106,9 +109,9 @@ def connect():
             query_connect = "INSERT INTO connects_db (host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
             cursor.execute(query_connect, value_connect)
-        db.commit()
+            db.commit()
     return render_template('connect_db.jinja2')
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
