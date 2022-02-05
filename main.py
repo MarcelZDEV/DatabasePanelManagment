@@ -71,13 +71,13 @@ def register():
         val = (user_reg,)
         cursor.execute(sqlq, val)
         if cursor.fetchone()[0]:
-            return render_template('login.jinja2')
+            return render_template('register.jinja2')
         else:
             execute = "INSERT INTO users_db (username, password, email, account) VALUES(%s, %s, %s, %s)"
             value = (user_reg, password_reg, email, "normal")
             cursor.execute(execute, value)
             db.commit()
-            return render_template('login.jinja2')
+            return redirect(url_for('login'))
     return render_template('register.jinja2')
 
 
@@ -92,21 +92,33 @@ def logout():
 def databases():
     if "admin" in session:
         root = session["admin"]
+        select_all_connects = "SELECT database_name FROM connects_db WHERE user_name_table = %s"
+        value_select = root
+        cursor.execute(select_all_connects, value_select)
+        print(cursor)
         return render_template('database_home.jinja2', root=root)
+    elif "normal" in session:
+        name = session["normal"]
+        return render_template('database_home.jinja2', root=name)
     else:
         return redirect(url_for('login'))
 
 
 @app.route('/Connect', methods=['POST', 'GET'])
 def connect():
-    if "admin" in session:
-        if request.method == 'POST':
-            host_connect = request.form['host_connect']
-            user_connect = request.form['name_connect']
-            pass_connect = request.form['pass_connect']
-            data_connect = request.form['data_connect']
-            user_name = session["admin"]
-            query_connect = "INSERT INTO connects_db (host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
+    if request.method == 'POST':
+        host_connect = request.form['host_connect']
+        user_connect = request.form['name_connect']
+        pass_connect = request.form['pass_connect']
+        data_connect = request.form['data_connect']
+        query_connect = "INSERT INTO connects_db (host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
+        if "admin" in session:
+            user_name_admin = session["admin"]
+            value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
+            cursor.execute(query_connect, value_connect)
+            db.commit()
+        elif "normal" in session:
+            user_name = session["normal"]
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
             cursor.execute(query_connect, value_connect)
             db.commit()
