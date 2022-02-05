@@ -94,7 +94,7 @@ def databases():
         select_all_connects = "SELECT database_name FROM connects_db WHERE user_name_table = %s"
         value_select = (user,)
         cursor.execute(select_all_connects, value_select)
-        get_db = cursor.fetchone()
+        get_db = cursor.fetchall()
         return render_template('database_home.jinja2', db=get_db)
     elif "normal" in session:
         user = session["normal"]
@@ -130,5 +130,10 @@ def connect():
     return render_template('connect_db.jinja2')
 
 
+@app.route('/Connect-Page')
+def connect_page():
+    return render_template('db_page.jinja2')
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
