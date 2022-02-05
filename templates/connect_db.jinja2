@@ -1,0 +1,40 @@
+{% extends 'index.jinja2' %}
+{% block title %}Connect{% endblock %}
+{% block content %}
+    <form method="post" action="#">
+        <div class="input-group mb-3">
+            <span class="input-group-text">host</span>
+            <div class="input-group-append">
+            </div>
+            <input type="text" class="form-control" placeholder="Host"
+                   name="host_connect">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">user</span>
+            </div>
+            <input type="text" class="form-control" placeholder="Username" name="name_connect">
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">password</span>
+            <div class="input-group-append">
+
+            </div>
+            <input type="password" class="form-control" placeholder="Your Password"
+                   name="pass_connect">
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">database</span>
+            <div class="input-group-append">
+            </div>
+            <input type="text" class="form-control" placeholder="Your Database Name"
+                   name="data_connect">
+        </div>
+        <div class="input-group mb-3">
+            <button class="btn btn-lg btn-success" type="submit">Send</button>
+            <button class="btn btn-lg btn-danger" type="reset">Cancel</button>
+        </div>
+    </form>
+{% endblock %}
