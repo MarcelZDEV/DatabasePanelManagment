@@ -1,5 +1,4 @@
-from flask import Flask, url_for, redirect, request, render_template, session
-
+from flask import Flask, url_for, redirect, request, render_template, session, jsonify
 import db
 from db import *
 from datetime import timedelta
@@ -91,15 +90,19 @@ def logout():
 @app.route('/Databases', methods=['POST', 'GET'])
 def databases():
     if "admin" in session:
-        root = session["admin"]
+        user = session["admin"]
         select_all_connects = "SELECT database_name FROM connects_db WHERE user_name_table = %s"
-        value_select = root
+        value_select = (user,)
         cursor.execute(select_all_connects, value_select)
-        print(cursor)
-        return render_template('database_home.jinja2', root=root)
+        get_db = cursor.fetchone()
+        return render_template('database_home.jinja2', db=get_db)
     elif "normal" in session:
-        name = session["normal"]
-        return render_template('database_home.jinja2', root=name)
+        user = session["normal"]
+        select_all_connects = "SELECT database_name FROM connects_db WHERE user_name_table = %s"
+        value_select = (user,)
+        cursor.execute(select_all_connects, value_select)
+        get_db = cursor.fetchall()
+        return render_template('database_home.jinja2', db=get_db)
     else:
         return redirect(url_for('login'))
 
@@ -117,13 +120,15 @@ def connect():
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
             cursor.execute(query_connect, value_connect)
             db.commit()
+            return redirect(url_for('databases'))
         elif "normal" in session:
             user_name = session["normal"]
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
             cursor.execute(query_connect, value_connect)
             db.commit()
+            return redirect(url_for('databases'))
     return render_template('connect_db.jinja2')
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

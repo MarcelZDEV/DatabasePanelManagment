@@ -5,8 +5,11 @@
         <form method="post">
             <a class="btn btn-lg btn-success" href="{{ url_for('connect') }}">Add Connect</a>
         </form>
-        <div>
-
+        <br>
+        <div class="text-light">
+            {% for i in db %}
+                <h4>{{ i[0] }}</h4>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}
