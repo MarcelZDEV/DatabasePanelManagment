@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, request, render_template, session, jsonify
+from flask import Flask, url_for, redirect, request, render_template, session
 import db
 from db import *
 from datetime import timedelta
@@ -114,22 +114,25 @@ def connect():
         user_connect = request.form['name_connect']
         pass_connect = request.form['pass_connect']
         data_connect = request.form['data_connect']
-        query_connect = "INSERT INTO connects_db(host, username, password, database_name, user_name_table) \
-    select * from( Select %s, %s, %s, %s, %s) as temp \
-    where not exists \
-    (Select user_name_table from connects_db where user_name_table) LIMIT 1"
-        if "admin" in session:
-            user_name_admin = session["admin"]
-            value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
-            cursor.execute(query_connect, value_connect)
-            db.commit()
-        elif "normal" in session:
-            user_name = session["normal"]
-            value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
-            cursor.execute(query_connect, value_connect)
-            db.commit()
+        query_connect = "INSERT INTO connects_db(host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
+        check_db_query = "SELECT COUNT(1) FROM connects_db WHERE database_name = %s"
+        value = (data_connect, )
+        cursor.execute(check_db_query, value)
+        if cursor.fetchone()[0]:
+            print("exist")
         else:
-            print("test")
+            if "admin" in session:
+                user_name_admin = session["admin"]
+                value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
+                cursor.execute(query_connect, value_connect)
+                db.commit()
+            elif "normal" in session:
+                user_name = session["normal"]
+                value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
+                cursor.execute(query_connect, value_connect)
+                db.commit()
+            else:
+                print("test")
     return render_template('connect_db.jinja2')
 
 
@@ -139,9 +142,10 @@ def connect_page():
         user_name = session["admin"]
         render_template('db_page.jinja2', name=user_name)
     elif "normal" in session:
-        user_name_normal = session["normal"]
-    return render_template('db_page.jinja2', name=user_name)
+        user_name = session["normal"]
+        return render_template('db_page.jinja2', name=user_name)
+    return render_template('db_page.jinja2')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
