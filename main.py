@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, request, render_template, session
+from flask import Flask, url_for, redirect, request, render_template, session, flash
 import db
 from db import *
 from datetime import timedelta
@@ -46,13 +46,20 @@ def login():
             val_root = (user, password)
             cursor.execute(check_root, val_root)
             results = cursor.fetchone()
-            if 'root' in results:
-                session["admin"] = user
-                print("admin")
+            if results is not None:
+                if 'root' in results:
+                    session["admin"] = user
+                    print("admin")
+                    return redirect(url_for('databases'))
+                elif 'normal' in results:
+                    session["normal"] = user
+                    return redirect(url_for('home_page'))
+                else:
+                    flash('Your login information are wrong', 'info')
             else:
-                session["normal"] = user
-            return redirect(url_for('home_page'))
+                flash('Your login information are wrong', 'info')
         else:
+            flash('Your login information are wrong', 'info')
             return render_template('login.jinja2')
     else:
         if "normal" in session or "admin" in session:
@@ -70,6 +77,7 @@ def register():
         val = (user_reg,)
         cursor.execute(sqlq, val)
         if cursor.fetchone()[0]:
+            flash('Username already exist. Try other name', 'info')
             return render_template('register.jinja2')
         else:
             execute = "INSERT INTO users_db (username, password, email, account) VALUES(%s, %s, %s, %s)"
@@ -104,6 +112,7 @@ def databases():
         get_db = cursor.fetchall()
         return render_template('database_home.jinja2', db=get_db)
     else:
+        flash('You have to login on page to move on this side', 'info')
         return redirect(url_for('login'))
 
 
@@ -116,10 +125,11 @@ def connect():
         data_connect = request.form['data_connect']
         query_connect = "INSERT INTO connects_db(host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
         check_db_query = "SELECT COUNT(1) FROM connects_db WHERE database_name = %s"
-        value = (data_connect, )
+        value = (data_connect,)
         cursor.execute(check_db_query, value)
         if cursor.fetchone()[0]:
-            print("exist")
+            flash('You already have db with this name', 'info')
+            render_template('connect_db.jinja2')
         else:
             if "admin" in session:
                 user_name_admin = session["admin"]
@@ -132,7 +142,7 @@ def connect():
                 cursor.execute(query_connect, value_connect)
                 db.commit()
             else:
-                print("test")
+                print("404")
     return render_template('connect_db.jinja2')
 
 
@@ -148,4 +158,4 @@ def connect_page():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
