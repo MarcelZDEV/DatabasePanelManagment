@@ -114,25 +114,33 @@ def connect():
         user_connect = request.form['name_connect']
         pass_connect = request.form['pass_connect']
         data_connect = request.form['data_connect']
-        query_connect = "INSERT INTO connects_db (host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
+        query_connect = "INSERT INTO connects_db(host, username, password, database_name, user_name_table) \
+    select * from( Select %s, %s, %s, %s, %s) as temp \
+    where not exists \
+    (Select user_name_table from connects_db where user_name_table) LIMIT 1"
         if "admin" in session:
             user_name_admin = session["admin"]
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
             cursor.execute(query_connect, value_connect)
             db.commit()
-            return redirect(url_for('databases'))
         elif "normal" in session:
             user_name = session["normal"]
             value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
             cursor.execute(query_connect, value_connect)
             db.commit()
-            return redirect(url_for('databases'))
+        else:
+            print("test")
     return render_template('connect_db.jinja2')
 
 
 @app.route('/Connect-Page')
 def connect_page():
-    return render_template('db_page.jinja2')
+    if "admin" in session:
+        user_name = session["admin"]
+        render_template('db_page.jinja2', name=user_name)
+    elif "normal" in session:
+        user_name_normal = session["normal"]
+    return render_template('db_page.jinja2', name=user_name)
 
 
 if __name__ == '__main__':
