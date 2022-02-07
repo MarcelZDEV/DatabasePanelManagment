@@ -1,7 +1,7 @@
-from flask import Flask, url_for, redirect, request, render_template, session, flash
+from flask import Flask, url_for, redirect, render_template, session, flash
 from db import *
 from datetime import timedelta
-from basic import basic
+from src.basic import basic
 
 app = Flask(__name__)
 app.secret_key = "root"
@@ -20,6 +20,12 @@ def home_page():
 
 @app.route("/account-chose")
 def account():
+    if "admin" in session:
+        root = session["admin"]
+        return render_template("account.jinja2", user=root)
+    elif "normal" in session:
+        user = session["normal"]
+        return render_template("account.jinja2", user=user)
     return render_template("account.jinja2")
 
 

@@ -11,17 +11,6 @@ def home():
     return render_template('index.jinja2')
 
 
-@basic.route('/account-chose')
-@basic.route('/account')
-def account():
-    if "admin" in session:
-        root = session["admin"]
-        return render_template("account.jinja2", user=root)
-    else:
-        user = session["normal"]
-        return render_template("account.jinja2", user=user)
-
-
 @basic.route('/account-login', methods=['POST', 'GET'])
 @basic.route('/login', methods=['POST', 'GET'])
 def login():
@@ -41,10 +30,10 @@ def login():
             if results is not None:
                 if 'root' in results:
                     session["admin"] = user
-                    return redirect(url_for('databases'))
+                    return redirect(url_for('database'))
                 elif 'normal' in results:
                     session["normal"] = user
-                    return redirect(url_for('home_page'))
+                    return redirect(url_for('database'))
                 else:
                     flash('Your login information are wrong', 'info')
             else:
@@ -85,7 +74,7 @@ def database():
     return render_template('database_home.jinja2')
 
 
-@basic.route('/add-connect')
+@basic.route('/add-connect', methods=['POST', 'GET'])
 def add_connect():
     if request.method == 'POST':
         host_connect = request.form['host_connect']
