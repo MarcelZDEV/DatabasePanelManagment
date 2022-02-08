@@ -69,11 +69,6 @@ def register():
     return render_template('register.jinja2')
 
 
-@basic.route('/database')
-def database():
-    return render_template('database_home.jinja2')
-
-
 @basic.route('/add-connect', methods=['POST', 'GET'])
 def add_connect():
     if request.method == 'POST':

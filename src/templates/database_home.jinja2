@@ -8,7 +8,9 @@
         <br>
         <div class="text-light">
             {% for i in db %}
-                <a class="text-light btn" href="{{ url_for('connect_page') }}"><h4>{{ i[0] }}</h4></a><br>
+                <a class="text-light btn link" href="{{ url_for('connect_page') }}" id="{{ i[0] }}"><h4>{{ i[0] }}</h4>
+                </a>
+                <br>
             {% endfor %}
         </div>
     </div>

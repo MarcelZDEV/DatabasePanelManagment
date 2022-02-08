@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, render_template, session, flash
+from flask import Flask, url_for, redirect, render_template, session, flash, request
 from db import *
 from datetime import timedelta
 from src.basic import basic
@@ -46,8 +46,8 @@ def logout():
     return render_template('account.jinja2')
 
 
-@app.route('/databases')
-def databases():
+@app.route('/database')
+def database():
     if "admin" in session:
         user = session["admin"]
         select_all_connects = "SELECT database_name FROM dbpm.connects_db WHERE user_name_table = %s"
@@ -74,12 +74,13 @@ def connect():
 
 @app.route('/Connect-Page')
 def connect_page():
-    # select_password = "SELECT password FROM dbpm.connects_db WHERE "
     if "admin" in session:
         user_name = session["admin"]
         render_template('db_page.jinja2', name=user_name)
     elif "normal" in session:
         user_name = session["normal"]
+        get_id = request.args.get("")
+        print(get_id)
         return render_template('db_page.jinja2', name=user_name)
     return render_template('db_page.jinja2')
 
