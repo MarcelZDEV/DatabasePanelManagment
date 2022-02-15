@@ -11,6 +11,7 @@ user_host = ""
 username = ""
 password_conn = ""
 db_name = ""
+global id_db
 
 
 @app.route('/')
@@ -50,14 +51,14 @@ def logout():
 def database():
     if "admin" in session:
         user = session["admin"]
-        select_all_connects = "SELECT database_name FROM dbpm.connects_db WHERE user_name_table = %s"
+        select_all_connects = "SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s"
         value_select = (user,)
         cursor.execute(select_all_connects, value_select)
         get_db = cursor.fetchall()
         return render_template('database_home.jinja2', db=get_db)
     elif "normal" in session:
         user = session["normal"]
-        select_all_connects = "SELECT database_name FROM dbpm.connects_db WHERE user_name_table = %s"
+        select_all_connects = "SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s"
         value_select = (user,)
         cursor.execute(select_all_connects, value_select)
         get_db = cursor.fetchall()
@@ -72,17 +73,28 @@ def connect():
     return render_template('add_connect.jinja2')
 
 
-@app.route('/Connect-Page')
-def connect_page():
+@app.route('/connect-page/<id>', methods=['GET', 'POST'])
+def connect_page(id):
     if "admin" in session:
         user_name = session["admin"]
-        render_template('db_page.jinja2', name=user_name)
+        return render_template('db_page.jinja2', name_id=id, name=user_name)
     elif "normal" in session:
         user_name = session["normal"]
-        get_id = request.args.get("")
-        print(get_id)
-        return render_template('db_page.jinja2', name=user_name)
-    return render_template('db_page.jinja2')
+        return render_template('db_page.jinja2', name_id=id, name=user_name)
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/connect-page/mysql-statements/<id>', methods=["GET", 'POST'])
+def statements(id):
+    if "admin" in session:
+        user_name = session["admin"]
+        return render_template('MySQL_Statements.jinja2', name_id=id)
+    elif "normal" in session:
+        user_name = session["normal"]
+        return render_template('MySQL_Statements.jinja2', name_id=id)
+    else:
+        return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
