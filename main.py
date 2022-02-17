@@ -7,11 +7,6 @@ app = Flask(__name__)
 app.secret_key = "root"
 app.permanent_session_lifetime = timedelta(minutes=60)
 app.register_blueprint(basic, url_prefix="")
-user_host = ""
-username = ""
-password_conn = ""
-db_name = ""
-global id_db
 
 
 @app.route('/')
@@ -73,26 +68,26 @@ def connect():
     return render_template('add_connect.jinja2')
 
 
-@app.route('/connect-page/<id>', methods=['GET', 'POST'])
-def connect_page(id):
+@app.route('/connect-page/<name_id>', methods=['GET', 'POST'])
+def connect_page(name_id):
     if "admin" in session:
         user_name = session["admin"]
-        return render_template('db_page.jinja2', name_id=id, name=user_name)
+        return render_template('db_page.jinja2', name_id=name_id, name=user_name)
     elif "normal" in session:
         user_name = session["normal"]
-        return render_template('db_page.jinja2', name_id=id, name=user_name)
+        return render_template('db_page.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
 
 
-@app.route('/connect-page/mysql-statements/<id>', methods=["GET", 'POST'])
-def statements(id):
+@app.route('/connect-page/mysql-statements/<name_id>', methods=["GET", 'POST'])
+def statements(name_id):
     if "admin" in session:
         user_name = session["admin"]
-        return render_template('MySQL_Statements.jinja2', name_id=id)
+        return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     elif "normal" in session:
         user_name = session["normal"]
-        return render_template('MySQL_Statements.jinja2', name_id=id)
+        return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
 
