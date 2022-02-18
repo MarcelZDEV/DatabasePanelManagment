@@ -5,15 +5,19 @@
         <div class="float-right col-9">
             <div class="d-flex flex-row">
                 <label>
-                    <textarea rows="5" cols="187.5" style="width: 100%"></textarea>
+                    <textarea rows="5" cols="187.5" style="width: 100%" id="textarea"></textarea>
                 </label>
             </div>
-            <div class="d-flex flex-row btn-group">
-                <button class="btn btn-success">SELECT</button>
-                <button class="btn btn-success">INSERT</button>
-                <button class="btn btn-success">UPDATE</button>
-                <button class="btn btn-success">DROP</button>
-            </div>
+            <form method="post">
+                <div class="d-flex flex-row btn-group">
+                    <input class="btn btn-success" type="submit" name="select" value="SELECT" onclick="select()">
+                    <input class="btn btn-success" type="submit" name="insert" value="INSERT">
+                    <input class="btn btn-success" type="submit" name="update" value="UPDATE">
+                    <input class="btn btn-success" type="submit" name="drop" value="DROP">
+                </div>
+            </form>
         </div>
     </div>
+    <script type="text/javascript"
+         src="static/select.js"></script>
 {% endblock %}

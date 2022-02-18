@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, render_template, session, flash, request
+from flask import Flask, url_for, redirect, render_template, session, flash, request, send_from_directory
 from db import *
 from datetime import timedelta
 from src.basic import basic
@@ -90,6 +90,35 @@ def statements(name_id):
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
+
+
+@app.route('/add-connect', methods=['POST', 'GET'])
+def add_connect():
+    if request.method == 'POST':
+        host_connect = request.form['host_connect']
+        user_connect = request.form['name_connect']
+        pass_connect = request.form['pass_connect']
+        data_connect = request.form['data_connect']
+        insert_connect = "INSERT INTO dbpm.db_connects(host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
+        check_db = "SELECT COUNT(1) FROM dbpm.db_connects WHERE database_name = %s"
+        value = (data_connect,)
+        cursor.execute(check_db, value)
+        if cursor.fetchone()[0]:
+            flash('You already have db with this name', 'info')
+            return render_template('add_connect.jinja2')
+        else:
+            if "admin" in session:
+                user_name_admin = session["admin"]
+                value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name_admin)
+                cursor.execute(insert_connect, value_connect)
+                db.commit()
+            elif "normal" in session:
+                user_name = session["normal"]
+                value_connect = (host_connect, user_connect, pass_connect, data_connect, user_name)
+                cursor.execute(insert_connect, value_connect)
+                db.commit()
+            return redirect(url_for('database'))
+    return render_template('add_connect.jinja2')
 
 
 if __name__ == '__main__':

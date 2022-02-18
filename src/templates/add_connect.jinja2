@@ -1,6 +1,13 @@
 {% extends 'index.jinja2' %}
 {% block title %}Connect{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg_add in messages %}
+                <p class="text-light">{{ msg_add }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <form method="post" action="#">
         <div class="input-group mb-3">
             <span class="input-group-text">host</span>
