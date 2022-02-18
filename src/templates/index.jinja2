@@ -31,7 +31,24 @@
 </div>
 {% block content %}
 {% endblock %}
-<script src="keyboard_shortcut.js"></script>
+<script>
+    function back() {
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'z') {
+                window.history.back();
+            }
+        });
+    }
+
+    function forward() {
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'y') {
+                window.history.forward();
+            }
+        });
+    }
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
