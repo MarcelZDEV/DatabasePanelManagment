@@ -9,5 +9,3 @@ db = mysql.connector.connect(
 )
 
 cursor = db.cursor()
-
-print(db)

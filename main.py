@@ -1,17 +1,18 @@
-from flask import Flask, url_for, redirect, render_template, session, flash, request, send_from_directory
+from flask import Flask, url_for, redirect, render_template, session, flash, request
 from db import *
 from datetime import timedelta
-from src.basic import basic
+import mysql.connector
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.secret_key = "root"
 app.permanent_session_lifetime = timedelta(minutes=60)
-app.register_blueprint(basic, url_prefix="")
+global db_user
 
 
 @app.route('/')
-def home_page():
-    return render_template("index.jinja2")
+@app.route('/home')
+def home():
+    return render_template('index.jinja2')
 
 
 @app.route("/account-chose")
@@ -23,16 +24,6 @@ def account():
         user = session["normal"]
         return render_template("account.jinja2", user=user)
     return render_template("account.jinja2")
-
-
-@app.route("/account-login")
-def login():
-    return render_template('login.jinja2')
-
-
-@app.route('/account-register', methods=['POST', 'GET'])
-def register():
-    return render_template('register.jinja2')
 
 
 @app.route('/logout')
@@ -63,11 +54,6 @@ def database():
         return redirect(url_for('login'))
 
 
-@app.route('/add-connect', methods=['POST', 'GET'])
-def connect():
-    return render_template('add_connect.jinja2')
-
-
 @app.route('/connect-page/<name_id>', methods=['GET', 'POST'])
 def connect_page(name_id):
     if "admin" in session:
@@ -84,9 +70,37 @@ def connect_page(name_id):
 def statements(name_id):
     if "admin" in session:
         user_name = session["admin"]
+        host_user_user = user_name
+        print(host_user_user)
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     elif "normal" in session:
         user_name = session["normal"]
+        if request.method == 'POST':
+            get_execute = request.form['mysql']
+            host_user_user = user_name
+            name_id_db = name_id
+            query = (host_user_user, name_id_db,)
+
+            host_user = 'SELECT host FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            to_db_connect_host = cursor.execute(host_user, query)
+
+            user_user = 'SELECT username FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            to_db_connect_user = cursor.execute(user_user, query)
+
+            password_user = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            to_db_connect_password = cursor.execute(password_user, query)
+
+            data_pass_user = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            to_db_connect_data = cursor.execute(data_pass_user, query)
+            global db_user
+            db_user = mysql.connector.connect(
+                host=f"{to_db_connect_host}",
+                user=f"{to_db_connect_user}",
+                password=f"{to_db_connect_password}",
+                database=f"{to_db_connect_data}",
+                port="3306"
+            )
+            print(db_user)
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
@@ -119,6 +133,64 @@ def add_connect():
                 db.commit()
             return redirect(url_for('database'))
     return render_template('add_connect.jinja2')
+
+
+@app.route('/account-login', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        session.permanent = True
+        user = request.form["name"]
+        password = request.form["pass"]
+        check_user_exist = "SELECT COUNT(1) FROM dbpm.user WHERE username = %s AND password = %s"
+        check_root = "SELECT account FROM dbpm.user WHERE username = %s AND password = %s"
+        val = (user, password)
+        cursor.execute(check_user_exist, val)
+        if cursor.fetchone():
+            session["normal"] = user
+            val_root = (user, password)
+            cursor.execute(check_root, val_root)
+            results = cursor.fetchone()
+            if results is not None:
+                if 'root' in results:
+                    session["admin"] = user
+                    return redirect(url_for('database'))
+                elif 'normal' in results:
+                    session["normal"] = user
+                    return redirect(url_for('database'))
+                else:
+                    flash('Your login information are wrong', 'info')
+            else:
+                flash('Your login information are wrong', 'info')
+        else:
+            flash('Your login information are wrong', 'info')
+            return render_template('login.jinja2')
+    else:
+        if "normal" in session or "admin" in session:
+            return render_template("login.jinja2")
+    return render_template('login.jinja2')
+
+
+@app.route('/account-register', methods=['POST', 'GET'])
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        user_reg = request.form["name_reg"]
+        password_reg = request.form["pass_reg"]
+        email_reg = request.form["email_reg"]
+        sqlq = "SELECT COUNT(*) FROM dbpm.user WHERE username = %s"
+        val = (user_reg,)
+        cursor.execute(sqlq, val)
+        if cursor.fetchone()[0]:
+            flash('Username already exist. Try other name', 'info')
+            return render_template('register.jinja2')
+        else:
+            execute = "INSERT INTO dbpm.user (username, password, email, account) VALUES(%s, %s, %s, %s)"
+            value = (user_reg, password_reg, email_reg, "normal")
+            cursor.execute(execute, value)
+            db.commit()
+            return redirect(url_for('login'))
+    return render_template('register.jinja2')
 
 
 if __name__ == '__main__':

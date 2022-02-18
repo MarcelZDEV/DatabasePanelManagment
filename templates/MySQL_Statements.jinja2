@@ -1,0 +1,16 @@
+{% extends 'db_page.jinja2' %}
+{% block title %}Connect Interface{% endblock %}
+{% block content %}
+    <div class="text-light" style="padding-left: 45px; padding-top: 10px; padding-right: 45px;">
+        <div class="float-right col-9">
+            <div class="d-flex flex-row">
+                <form method="post">
+                    <label>
+                        <textarea rows="5" cols="187.5" style="width: 100%" name="mysql"></textarea>
+                    </label>
+                    <button class="btn btn-success " type="submit">Execute</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
