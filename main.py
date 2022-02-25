@@ -85,10 +85,10 @@ def statements(name_id):
             database_name_connect = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             password_connect = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
 
-            cursor.execute(host_connect, query)
-            cursor.execute(username_connect, query)
-            cursor.execute(database_name_connect, query)
-            cursor.execute(password_connect, query)
+            host_connect = cursor.execute(host_connect, query)
+            username_connect = cursor.execute(username_connect, query)
+            database_name_connect = cursor.execute(database_name_connect, query)
+            password_connect = cursor.execute(password_connect, query)
 
             global db_user_connect
             db_user_connect = mysql.connector.connect(
@@ -98,6 +98,7 @@ def statements(name_id):
                 database=f"{database_name_connect}",
                 port="3306"
             )
+            print(db_user_connect)
 
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
