@@ -79,26 +79,25 @@ def statements(name_id):
             get_execute = request.form['mysql']
             user_name = user_name
             database_name = name_id
-            query = (user_name, database_name,)
+            query = (user_name, database_name)
             host_connect = 'SELECT host FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             username_connect = 'SELECT username FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             database_name_connect = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             password_connect = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
 
-            cursor.execute(host_connect, query, )
-            cursor.execute(username_connect, query, )
-            cursor.execute(database_name_connect, query, )
-            cursor.execute(password_connect, query, )
+            cursor.execute(host_connect, query)
+            cursor.execute(username_connect, query)
+            cursor.execute(database_name_connect, query)
+            cursor.execute(password_connect, query)
 
             global db_user_connect
-            for host, username, password, database_name in cursor:
-                db_user_connect = mysql.connector.connect(
-                    host=f"{host}",
-                    user=f"{username}",
-                    password=f"{password}",
-                    database=f"{database_name}",
-                    port="3306"
-                )
+            db_user_connect = mysql.connector.connect(
+                host=f"{host_connect}",
+                user=f"{username_connect}",
+                password=f"{password_connect}",
+                database=f"{database_name_connect}",
+                port="3306"
+            )
 
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
