@@ -77,32 +77,29 @@ def statements(name_id):
         user_name = session["normal"]
         if request.method == 'POST':
             get_execute = request.form['mysql']
-            name_id_db = name_id
-            query = (user_name, name_id_db,)
+            user_name = user_name
+            database_name = name_id
+            query = (user_name, database_name,)
+            host_connect = 'SELECT host FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            username_connect = 'SELECT username FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            database_name_connect = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
+            password_connect = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
 
-            host_user = 'SELECT host FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
-            to_db_connect_host = cursor.execute(host_user, query)
+            cursor.execute(host_connect, query, )
+            cursor.execute(username_connect, query, )
+            cursor.execute(database_name_connect, query, )
+            cursor.execute(password_connect, query, )
 
-            user_user = 'SELECT username FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
-            to_db_connect_user = cursor.execute(user_user, query)
-
-            password_user = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
-            to_db_connect_password = cursor.execute(password_user, query)
-
-            data_pass_user = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
-            to_db_connect_data = cursor.execute(data_pass_user, query)
             global db_user_connect
-            if to_db_connect_host is None:
-                print('test')
-            else:
+            for host, username, password, database_name in cursor:
                 db_user_connect = mysql.connector.connect(
-                    host=f"{to_db_connect_host}",
-                    user=f"{to_db_connect_user}",
-                    password=f"{to_db_connect_password}",
-                    database=f"{to_db_connect_data}",
+                    host=f"{host}",
+                    user=f"{username}",
+                    password=f"{password}",
+                    database=f"{database_name}",
                     port="3306"
                 )
-                print(db_user_connect)
+
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
