@@ -6,7 +6,7 @@ import mysql.connector
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "root"
 app.permanent_session_lifetime = timedelta(minutes=60)
-global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query
+global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query, user_cursor
 
 
 @app.route('/')
@@ -85,7 +85,7 @@ def statements(name_id):
             database_name_connect = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             password_connect = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
 
-            global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query
+            global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query, user_cursor
 
             cursor.execute(host_connect, query)
             for host_connect in cursor:
@@ -111,7 +111,15 @@ def statements(name_id):
                 port="3306"
             )
             print(db_user_connect)
-
+            user_cursor = db_user_connect.cursor()
+            try:
+                user_cursor.execute(get_execute)
+                for row in user_cursor:
+                    print(row)
+            except:
+                print("none")
+            finally:
+                db_user_connect.commit()
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
         return redirect(url_for('login'))
