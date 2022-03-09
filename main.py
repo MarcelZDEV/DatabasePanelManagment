@@ -114,13 +114,27 @@ def statements(name_id):
             user_cursor = db_user_connect.cursor()
             try:
                 user_cursor.execute(get_execute)
-                for row in user_cursor:
-                    print(row)
+                for result_execute in user_cursor:
+                    result_query = result_execute
+                    flash(result_query)
             except:
-                print("none")
+                flash('your statement is wrong, try something other')
             finally:
                 db_user_connect.commit()
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/connect-page/search/<name_id>', methods=['POST', 'GET'])
+def search(name_id):
+    if 'admin' in session:
+        return render_template('search.jinja2', name_id=name_id)
+    elif 'normal' in session:
+        if request.method == 'POST':
+            get_search = request.form['search']
+            print(get_search)
+        return render_template('search.jinja2', name_id=name_id)
     else:
         return redirect(url_for('login'))
 

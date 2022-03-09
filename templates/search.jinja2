@@ -5,18 +5,16 @@
         <div class="float-right col-9">
             <div class="d-flex flex-row">
                 <form method="post">
-                    <label>
-                        <textarea rows="5" cols="187.5" style="width: 100%" name="mysql"></textarea>
-                    </label>
-                    <button class="btn btn-success " type="submit">Execute</button>
+                    <input type="search" placeholder="search in db" class="col-12" name="search">
+                    <button class="btn btn-success" type="submit">Search</button>
                 </form>
             </div>
             <br>
             <div>
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
-                        {% for msg_result in messages %}
-                            <p class="text-light">{{ msg_result }}</p>
+                        {% for msg_result_search in messages %}
+                            <p class="text-light">{{ msg_result_search }}</p>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
