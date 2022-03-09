@@ -6,7 +6,7 @@ import mysql.connector
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "root"
 app.permanent_session_lifetime = timedelta(minutes=60)
-global db_user_connect
+global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query
 
 
 @app.route('/')
@@ -85,17 +85,29 @@ def statements(name_id):
             database_name_connect = 'SELECT database_name FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
             password_connect = 'SELECT password FROM dbpm.db_connects WHERE user_name_table = %s AND database_name = %s'
 
-            host_connect = cursor.execute(host_connect, query)
-            username_connect = cursor.execute(username_connect, query)
-            database_name_connect = cursor.execute(database_name_connect, query)
-            password_connect = cursor.execute(password_connect, query)
+            global db_user_connect, host_connect_query, username_connect_query, database_connect_query, password_connect_query
 
-            global db_user_connect
+            cursor.execute(host_connect, query)
+            for host_connect in cursor:
+                host_connect_query = "".join(host_connect)
+
+            cursor.execute(username_connect, query)
+            for username_connect in cursor:
+                username_connect_query = "".join(username_connect)
+
+            cursor.execute(database_name_connect, query)
+            for database_name_connect in cursor:
+                database_connect_query = "".join(database_name_connect)
+
+            cursor.execute(password_connect, query)
+            for password_connect in cursor:
+                password_connect_query = "".join(password_connect)
+
             db_user_connect = mysql.connector.connect(
-                host=f"{host_connect}",
-                user=f"{username_connect}",
-                password=f"{password_connect}",
-                database=f"{database_name_connect}",
+                host=f"{host_connect_query}",
+                user=f"{username_connect_query}",
+                password=f"{password_connect_query}",
+                database=f"{database_connect_query}",
                 port="3306"
             )
             print(db_user_connect)
