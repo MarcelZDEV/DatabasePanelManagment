@@ -135,19 +135,6 @@ def statements(name_id):
         return redirect(url_for('login'))
 
 
-@app.route('/connect-page/search/<name_id>', methods=['POST', 'GET'])
-def search(name_id):
-    if 'admin' in session:
-        return render_template('search.jinja2', name_id=name_id)
-    elif 'normal' in session:
-        if request.method == 'POST':
-            get_search = request.form['search']
-            print(get_search)
-        return render_template('search.jinja2', name_id=name_id)
-    else:
-        return redirect(url_for('login'))
-
-
 @app.route('/add-connect', methods=['POST', 'GET'])
 def add_connect():
     if request.method == 'POST':
@@ -197,9 +184,7 @@ def login():
                 if 'root' in results:
                     session["admin"] = user
                     return redirect(url_for('database'))
-                else:
-                    flash('Your login information are wrong', 'info')
-                if 'normal' in results:
+                elif 'normal' in results:
                     session["normal"] = user
                     return redirect(url_for('database'))
                 else:
