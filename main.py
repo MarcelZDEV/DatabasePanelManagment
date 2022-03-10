@@ -103,15 +103,22 @@ def statements(name_id):
             for password_connect in cursor:
                 password_connect_query = "".join(password_connect)
 
-            db_user_connect = mysql.connector.connect(
-                host=f"{host_connect_query}",
-                user=f"{username_connect_query}",
-                password=f"{password_connect_query}",
-                database=f"{database_connect_query}",
-                port="3306"
-            )
-            print(db_user_connect)
-            user_cursor = db_user_connect.cursor()
+            try:
+                db_user_connect = mysql.connector.connect(
+                    host=f"{host_connect_query}",
+                    user=f"{username_connect_query}",
+                    password=f"{password_connect_query}",
+                    database=f"{database_connect_query}",
+                    port="3306"
+                )
+            except:
+                flash("Your connection can be incorrect")
+            else:
+                if db_user_connect.is_connected():
+                    print(db_user_connect)
+                    user_cursor = db_user_connect.cursor()
+                else:
+                    flash("Your connection can be incorrect")
             try:
                 user_cursor.execute(get_execute)
                 for result_execute in user_cursor:
@@ -119,7 +126,8 @@ def statements(name_id):
                     flash(result_query)
             except:
                 flash('your statement is wrong, try something other')
-            finally:
+
+            else:
                 db_user_connect.commit()
         return render_template('MySQL_Statements.jinja2', name_id=name_id, name=user_name)
     else:
