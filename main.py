@@ -124,6 +124,7 @@ def statements(name_id):
                 for result_execute in user_cursor:
                     result_query = result_execute
                     flash(result_query)
+                flash("Your statement is correct")
             except:
                 flash('your statement is wrong, try something other')
 
@@ -183,7 +184,7 @@ def login():
         session.permanent = True
         user = request.form["name"]
         password = request.form["pass"]
-        check_user_exist = "SELECT COUNT(1) FROM dbpm.user WHERE username = %s AND password = %s"
+        check_user_exist = "SELECT * FROM dbpm.user WHERE username = %s AND password = %s"
         check_root = "SELECT account FROM dbpm.user WHERE username = %s AND password = %s"
         val = (user, password)
         cursor.execute(check_user_exist, val)
@@ -196,13 +197,16 @@ def login():
                 if 'root' in results:
                     session["admin"] = user
                     return redirect(url_for('database'))
-                elif 'normal' in results:
+                else:
+                    flash('Your login information are wrong', 'info')
+                if 'normal' in results:
                     session["normal"] = user
                     return redirect(url_for('database'))
                 else:
                     flash('Your login information are wrong', 'info')
             else:
                 flash('Your login information are wrong', 'info')
+                return render_template('login.jinja2')
         else:
             flash('Your login information are wrong', 'info')
             return render_template('login.jinja2')
