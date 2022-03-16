@@ -143,10 +143,10 @@ def add_connect():
         pass_connect = request.form['pass_connect']
         data_connect = request.form['data_connect']
         insert_connect = "INSERT INTO dbpm.db_connects(host, username, password, database_name, user_name_table) VALUES (%s, %s, %s, %s, %s)"
-        check_db = "SELECT COUNT(1) FROM dbpm.db_connects WHERE database_name = %s"
+        check_db = "SELECT * FROM dbpm.db_connects WHERE database_name = %s"
         value = (data_connect,)
         cursor.execute(check_db, value)
-        if cursor.fetchone()[0]:
+        if cursor.fetchone()[1]:
             flash('You already have db with this name', 'info')
             return render_template('add_connect.jinja2')
         else:

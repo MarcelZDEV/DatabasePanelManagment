@@ -31,7 +31,9 @@
     </div>
 </div>
 <div class="text-light" style="padding-left: 45px; padding-top: 10px; padding-right: 45px;">
-    <a href="{{ url_for('connect_page', name_id=name_id) }}" class="text-light"><h4>Database: {{ name_id }}</h4></a>
+    <div class="col-12 d-flex justify-content-between">
+        <a href="{{ url_for('connect_page', name_id=name_id) }}" class="text-light float-left"><h4>Database: {{ name_id }}</h4></a>
+    </div>
     <hr>
     <div class="float-left col-3">
         <div>
